@@ -1,10 +1,19 @@
 <ion-header>
   <ion-navbar>
-    <ion-title>Home</ion-title>
+    <ion-title></ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content padding>
+
+
+<ion-item>{{address}}</ion-item>
+
+<a (click)='getBalance()'>Balance</a>
+
+
+<a (click)='transfer()'>Transfer</a>
+  <!--
   <h2>Welcome to Ionic Ethereum Test App</h2>
   <ion-list>
     <ion-item>
@@ -36,5 +45,5 @@
     <ion-input placeholder="Amount" [(ngModel)]="trnAmount"></ion-input>
     <button ion-button color="secondary" (click)="sendTransaction()">Send Transaction</button>
     <h2>Transaction Id: <a href="https://rinkeby.etherscan.io/tx/{{trnHash}}">{{trnHash}}</a></h2>
-  </ion-card>
+  </ion-card>-->
 </ion-content>

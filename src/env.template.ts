@@ -1,8 +1,8 @@
 export let AppConfig: any = {
   ethereum: {
-    provider: 'http://localhost:8545',
+    provider: 'http://127.0.0.1:7545',
     privateKey: '',
-    account: '',,
+    account: '',
     recipient: '0x.......',
     amount: 0.1
   }

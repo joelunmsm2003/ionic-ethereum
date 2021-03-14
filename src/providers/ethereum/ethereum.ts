@@ -1,12 +1,20 @@
 
 import { Injectable } from '@angular/core';
-
+var Token  = require('./Token.json');
+var EthSwap  = require('./EthSwap.json');
 import Web3 from 'web3';
 import _ from 'lodash';
 import Bip39 from 'bip39';
 import HDKey from 'hdkey';
 import ethLib from 'eth-lib';
 import { AppConfig } from '../../env';
+
+
+declare global { interface Window { ethereum: any; } }
+declare global { interface Window { web3: any; } }
+
+
+
 
 @Injectable()
 export class EthereumProvider {
@@ -16,6 +24,10 @@ export class EthereumProvider {
   private privateKey: string;
   private publicKey: string;
   private mnemonic: string;
+  accounts:any;
+  token:any;
+  networkId:any;
+  ethswap:any;
 
   constructor(
   ) {
@@ -25,7 +37,123 @@ export class EthereumProvider {
     });
     this.accountAddress = AppConfig.ethereum.account;
     this.privateKey = AppConfig.ethereum.privateKey;
+    this.loadWeb3()
+    this.loadBlockchainData()
+
+
   }
+
+
+   async loadBlockchainData() {
+
+       this.networkId =  await this.web3.eth.net.getId()
+
+       var tokenData = Token.networks[this.networkId]
+
+       var ethData = EthSwap.networks[this.networkId]
+
+       console.log('ethData.address',ethData)
+
+       this.token = new this.web3.eth.Contract(Token.abi, tokenData.address)
+
+       this.ethswap = new this.web3.eth.Contract(EthSwap.abi, ethData.address)
+
+
+
+       let balance=await this.token.methods.balanceOf(this.ethswap.address).call()
+
+        let balance2=await this.token.methods.balanceOf(this.token.address).call()
+
+       console.log('balance ethswap.....',balance2.toString())
+       
+
+       console.log('balance ethswap.....',balance.toString())
+       
+       this.accounts = await this.web3.eth.getAccounts()
+
+       console.log(this.accounts)
+
+       let balance3=await this.token.methods.balanceOf(this.accounts[1]).call()
+
+       console.log('balance ethswap.....',balance3.toString())
+
+
+
+  
+
+  }
+
+    async loadWeb3() {
+    if (window.ethereum) {
+      window.web3 = new Web3(window.ethereum)
+      await window.ethereum.enable()
+    }
+    else if (window.web3) {
+      window.web3 = new Web3(window.web3.currentProvider)
+    }
+    else {
+      window.alert('Non-Ethereum browser detected. You should consider trying MetaMask!')
+    }
+  }
+
+  async getAddress(){
+
+     this.accounts = await this.web3.eth.getAccounts()
+
+     return this.accounts[0]
+
+  }
+
+
+  async getBalanceToken(){
+
+        let balance=await this.token.methods.balanceOf(this.ethswap.address).call()
+
+        let balance2=await this.token.methods.balanceOf(this.token.address).call()
+
+        let balance3=await this.token.methods.balanceOf(this.accounts[1]).call()
+
+        console.log('balance ethswap.....',balance2.toString())
+
+        console.log('balance ethswap.....',balance.toString())
+
+        console.log('balance ethswap.....',balance3.toString())
+  }
+
+
+
+  async transfer(){
+
+
+    this.token.methods.transfer(this.ethswap.address,100000).send({from: this.accounts[0]})
+    .then(function(receipt){
+        // receipt can also be a new contract instance, when coming from a "contract.deploy({...}).send()"
+    });
+
+     
+   /*
+
+    this.ethswap.methods.buyTokens().send({ value: '3210', from: "0xc460160A3CFe83Ff12d33332f5D92b14C732774E" }).on('transactionHash', (hash) => {
+
+      console.log('hash',hash)
+     
+    })
+    */
+   
+
+
+
+  }
+
+
+  async getBalance(){
+
+
+
+  }
+
+
+
 
   public getValue (key: string) {
     return _.get(this.web3, key);
@@ -49,7 +177,7 @@ export class EthereumProvider {
     this.accountAddress = account.address.substr(2);
     this.privateKey = account.privateKey.substr(2);
   }
-
+  /*
   public async getBalance() {
     let balance = 0;
     if (this.accountAddress) {
@@ -58,6 +186,9 @@ export class EthereumProvider {
     }
     return balance;
   }
+
+  */
+
 
   public async sendTransaction(address: string, amount: number) {
     const account = this.web3.eth.accounts.privateKeyToAccount('0x' + this.privateKey);

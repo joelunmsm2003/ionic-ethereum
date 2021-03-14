@@ -15,6 +15,8 @@ export class HomePage {
   private txtPrivKey;
   private txtPubKey;
   private txtBalance;
+  address:any;
+  balance:any;
 
   private trnAmount = AppConfig.ethereum.amount;
   private trnAddress: string = AppConfig.ethereum.recipient;
@@ -52,8 +54,31 @@ export class HomePage {
     this.txtMnemonic = this.ethereum.getMnemonic();
     this.txtBalance = await this.ethereum.getBalance();
   }
+
+  async getAddress(){
+
+    this.address= await this.ethereum.getAddress()
+    console.log('address',this.address)
+
+  }
+
+  async getBalance(){
+
+    await this.ethereum.getBalanceToken()
+
+  }
+
+  async transfer(){
+
+    await this.ethereum.transfer()
+
+  }
   
   ionViewDidEnter(){
-    this.getEthInfo();
+    //this.getEthInfo();
+
+    this.getAddress()
+
+
   }
 }
